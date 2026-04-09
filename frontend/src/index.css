@@ -1,0 +1,339 @@
+/* ═══════════════════════════════════════════════
+   PropVision.AI — Design System v2
+   Anti-slop. Every pixel intentional.
+   ═══════════════════════════════════════════════ */
+
+/* ── Design Tokens ────────────────────────────── */
+:root {
+  /* Surfaces — warm off-blacks, never pure #000 */
+  --bg: #0e0e0e;
+  --surface: #161616;
+  --surface-raised: #1c1c1c;
+  --surface-elevated: #232323;
+  --surface-overlay: rgba(14, 14, 14, 0.88);
+
+  /* Text — warm off-whites, never pure #fff */
+  --text-primary: #e8e4df;
+  --text-secondary: #8a8580;
+  --text-muted: #5c5856;
+  --text-ghost: #3a3836;
+
+  /* Accent — terracotta, appears < 5% of viewport */
+  --accent: #c4503a;
+  --accent-hover: #d4604a;
+  --accent-subtle: rgba(196, 80, 58, 0.1);
+  --accent-glow: rgba(196, 80, 58, 0.25);
+
+  /* Score colors */
+  --score-high: #5ab87a;
+  --score-mid: #c9a84c;
+  --score-low: #c4503a;
+
+  /* Borders — spectral, barely-there */
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(255, 255, 255, 0.12);
+  --border-accent: rgba(196, 80, 58, 0.3);
+
+  /* Typography */
+  --font-display: 'DM Serif Display', 'Georgia', serif;
+  --font-body: 'DM Sans', -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* Easing — premium expo curves */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* Spacing is NOT uniform */
+  --container-pad: clamp(1.5rem, 5vw, 6rem);
+  --panel-width: 400px;
+
+  /* Radius — intentional variety */
+  --r-none: 0;
+  --r-sm: 4px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-pill: 999px;
+}
+
+/* ── Reset ────────────────────────────────────── */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-body);
+  font-weight: 400;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow: hidden;
+  height: 100vh;
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+}
+
+/* ── Selection ────────────────────────────────── */
+::selection {
+  background: var(--accent);
+  color: var(--bg);
+}
+
+/* ── Scrollbar (minimal) ──────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--text-ghost);
+  border-radius: var(--r-pill);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* ── Grain overlay — organic texture ──────────── */
+.grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ── Section label — the "designed" signal ────── */
+.label {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ── Heading hierarchy ────────────────────────── */
+.h-display {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  color: var(--text-primary);
+}
+
+.h-xl { font-size: clamp(2.25rem, 5vw, 4.5rem); }
+.h-lg { font-size: clamp(1.75rem, 3.5vw, 2.75rem); }
+.h-md { font-size: clamp(1.25rem, 2vw, 1.75rem); }
+
+/* ── Mono accents for data ────────────────────── */
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* ── Buttons ──────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.4s var(--ease-out-expo);
+  white-space: nowrap;
+  border: none;
+  outline: none;
+}
+
+.btn-primary {
+  padding: 0.65rem 1.5rem;
+  background: var(--accent);
+  color: #faf5f0;
+  border-radius: var(--r-sm);
+  font-size: 0.8125rem;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary:hover {
+  background: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px -8px var(--accent-glow);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.5rem;
+  border-radius: var(--r-sm);
+}
+
+.btn-ghost:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.btn-chip {
+  padding: 0.35rem 0.875rem;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--r-pill);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.btn-chip:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+}
+
+/* ── Inputs ───────────────────────────────────── */
+.input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 400;
+  transition: border-color 0.3s var(--ease-out-expo);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-ghost);
+  font-weight: 300;
+}
+
+.input:focus {
+  border-color: var(--accent);
+}
+
+/* ── Badges — varied radius intentionally ─────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-score {
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--r-sm);
+}
+
+.badge-high {
+  background: rgba(90, 184, 122, 0.12);
+  color: var(--score-high);
+}
+.badge-mid {
+  background: rgba(201, 168, 76, 0.12);
+  color: var(--score-mid);
+}
+.badge-low {
+  background: rgba(196, 80, 58, 0.12);
+  color: var(--score-low);
+}
+
+.badge-tag {
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--r-pill);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Dividers — never full width ──────────────── */
+.divider {
+  width: 40%;
+  height: 1px;
+  background: var(--border);
+  border: none;
+  margin: 0;
+}
+
+/* ── Animations ───────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-24px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Skeleton (shimmer) ───────────────────────── */
+.skeleton {
+  background: linear-gradient(
+    110deg,
+    var(--surface) 30%,
+    var(--surface-raised) 50%,
+    var(--surface) 70%
+  );
+  background-size: 300% 100%;
+  animation: shimmer 1.8s ease infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+/* ── Layout ───────────────────────────────────── */
+.app-layout {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  display: flex;
+}
+
+.map-area {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    --panel-width: 100%;
+    --container-pad: 1.25rem;
+  }
+}

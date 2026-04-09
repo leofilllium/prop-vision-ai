@@ -1,0 +1,134 @@
+/* ── Search Bar ────────────────────────────────── */
+
+.search-wrap {
+  position: absolute;
+  top: 1.25rem;
+  right: var(--container-pad, 2.5rem);
+  left: auto;
+  transform: none;
+  z-index: 30;
+  width: min(400px, 45vw);
+  transition: right 0.4s var(--ease-out-expo);
+}
+
+.search-wrap.search-wrap--panel-open {
+  right: calc(416px + var(--container-pad, 1.5rem));
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  overflow: hidden;
+  /* no border-radius, no glass — clean editorial */
+}
+
+.search-icon {
+  flex-shrink: 0;
+  margin-left: 14px;
+  color: var(--text-ghost);
+}
+
+.search-field {
+  flex: 1;
+  padding: 0.75rem 0.75rem;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 400;
+  caret-color: var(--accent);
+}
+
+.search-field::placeholder {
+  color: var(--text-ghost);
+  font-weight: 300;
+  transition: opacity 0.3s;
+}
+
+.search-field:focus::placeholder {
+  opacity: 0.4;
+}
+
+.search-ai-tag {
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  padding: 2px 6px;
+  border: 1px solid var(--border-accent);
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.search-go {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: var(--accent);
+  border: none;
+  color: #faf5f0;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.3s var(--ease-out-expo);
+}
+
+.search-go:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.search-go:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.search-spin {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ── Status line ──────────────────────────────── */
+.search-status {
+  margin-top: 6px;
+  padding-left: 14px;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.02em;
+}
+
+.search-status--err {
+  color: var(--accent);
+}
+
+/* ── Responsive ───────────────────────────────── */
+@media (max-width: 768px) {
+  .search-wrap {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: 92vw;
+  }
+
+  .search-wrap.search-wrap--panel-open {
+    right: auto;
+  }
+}

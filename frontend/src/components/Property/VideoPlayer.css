@@ -1,0 +1,336 @@
+/* ─── VideoPlayer — Cinematic Scroll-to-Seek Player ─────────────────────── */
+
+.vp-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  cursor: none; /* replaced with custom cursor */
+  user-select: none;
+}
+
+/* ── video element ── */
+.vp-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  will-change: transform;
+}
+
+/* ── Custom cursor ── */
+.vp-cursor {
+  pointer-events: none;
+  position: absolute;
+  z-index: 50;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.2s ease;
+}
+
+.vp-cursor-ring {
+  width: 42px;
+  height: 42px;
+  border: 1.5px solid rgba(255,255,255,0.75);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+  background: rgba(255,255,255,0.05);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.vp-cursor-arrows {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  opacity: 0.9;
+}
+
+.vp-cursor-arrow {
+  font-size: 10px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1;
+}
+
+/* ── Dark gradient overlays for legibility ── */
+.vp-gradient-top {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 30%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.vp-gradient-bottom {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 45%);
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* ── Title badge ── */
+.vp-title {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  font-family: 'Clash Display', 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  padding: 4px 10px;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 40px;
+  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.25);
+}
+
+/* ── "SCROLL TO EXPLORE" hint ── */
+.vp-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  pointer-events: none;
+  transition: opacity 0.6s ease;
+}
+
+.vp-hint--hidden {
+  opacity: 0;
+}
+
+.vp-hint-icon {
+  width: 52px;
+  height: 52px;
+  border: 1.5px solid rgba(255,255,255,0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  animation: vp-pulse 2s ease-in-out infinite;
+}
+
+.vp-hint-scroll-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.vp-hint-scroll-icon span {
+  display: block;
+  font-size: 9px;
+  color: rgba(255,255,255,0.9);
+  line-height: 1;
+}
+
+.vp-hint-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.55);
+}
+
+.vp-hint-sub {
+  font-family: 'Inter', sans-serif;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  color: rgba(255,255,255,0.3);
+  margin-top: 4px;
+}
+
+@keyframes vp-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50%       { transform: scale(1.08); opacity: 1; }
+}
+
+/* ── Play/pause center flash ── */
+.vp-play-flash {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 25;
+  pointer-events: none;
+}
+
+.vp-play-flash-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: vp-flash-in 0.5s ease forwards;
+}
+
+.vp-play-flash-icon svg {
+  width: 24px;
+  height: 24px;
+  color: #fff;
+}
+
+@keyframes vp-flash-in {
+  0%   { transform: scale(0.8); opacity: 0; }
+  30%  { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1.3); opacity: 0; }
+}
+
+/* ── Bottom controls ── */
+.vp-controls {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  padding: 0 16px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Time display ── */
+.vp-time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.vp-time {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+  letter-spacing: 0.05em;
+}
+
+.vp-time-sep {
+  color: rgba(255,255,255,0.25);
+  margin: 0 2px;
+}
+
+.vp-playback-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: rgba(255,255,255,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+.vp-playback-btn:hover { color: #fff; }
+
+/* ── Progress bar ── */
+.vp-progress-track {
+  position: relative;
+  width: 100%;
+  height: 3px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: height 0.2s ease;
+}
+
+.vp-progress-track:hover {
+  height: 5px;
+}
+
+.vp-progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: linear-gradient(90deg, #a78bfa, #60a5fa);
+  border-radius: 2px;
+  pointer-events: none;
+  transition: width 0.05s linear;
+}
+
+.vp-progress-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 6px rgba(167,139,250,0.8);
+  pointer-events: none;
+  transition: transform 0.2s ease;
+}
+
+.vp-progress-track:hover .vp-progress-thumb {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+/* ── Scroll-direction indicator sidebar ── */
+.vp-scroll-dir {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.vp-scroll-dir--visible {
+  opacity: 1;
+}
+
+.vp-scroll-dir-arrow {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.vp-scroll-dir-arrow--active {
+  color: #a78bfa;
+  transform: scale(1.3);
+}
+
+/* ── Seek amount indicator ── */
+.vp-seek-badge {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translate(-50%, -50%);
+  z-index: 30;
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,0.9);
+  background: rgba(167,139,250,0.2);
+  border: 1px solid rgba(167,139,250,0.35);
+  border-radius: 6px;
+  padding: 4px 12px;
+  backdrop-filter: blur(8px);
+  pointer-events: none;
+  transition: opacity 0.4s ease;
+  white-space: nowrap;
+}
+
+.vp-seek-badge--hidden {
+  opacity: 0;
+}

@@ -1,0 +1,76 @@
+/* NavBar — pinned top-left, intentionally light */
+
+.nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  padding: 1.25rem var(--container-pad);
+  animation: fadeIn 0.6s var(--ease-out-expo);
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.nav-mark {
+  width: 26px;
+  height: 26px;
+  background: var(--accent);
+  border-radius: var(--r-sm);
+  /* hard geometric mark — intentionally no border-radius: 50% */
+}
+
+.nav-text {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+}
+
+.nav-name {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+}
+
+.nav-tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+
+.nav-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-left: 1rem;
+  border-left: 1px solid var(--border);
+}
+
+.nav-separator {
+  font-size: 0.625rem;
+  color: var(--text-ghost);
+  font-family: var(--font-mono);
+}
+
+.nav-link {
+  text-decoration: none;
+  transition: color 0.3s var(--ease-out-expo);
+}
+
+.nav-link:hover {
+  color: var(--accent);
+}
+
+.nav-brand {
+  text-decoration: none;
+}

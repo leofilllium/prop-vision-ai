@@ -1,0 +1,117 @@
+services:
+  # ─────────────────────────────────────────────
+  # PropVision AI: Docker Compose Configuration
+  # ─────────────────────────────────────────────
+  # Quick Setup: 
+  #   1. docker-compose up -d --build
+  #   2. docker exec -it propvision-api bash scripts/setup_data.sh
+  # ─────────────────────────────────────────────
+  # ─────────────────────────────────────────────
+  # PostgreSQL 16 + PostGIS 3.4
+  # ─────────────────────────────────────────────
+  postgres:
+    image: postgis/postgis:16-3.4
+    container_name: propvision-postgres
+    environment:
+      POSTGRES_DB: propvision
+      POSTGRES_USER: propvision
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-propvision_secret}
+    ports:
+      - "55433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U propvision -d propvision"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - propvision-network
+
+  # ─────────────────────────────────────────────
+  # Redis 7
+  # ─────────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: propvision-redis
+    ports:
+      - "56379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - propvision-network
+
+  # ─────────────────────────────────────────────
+  # FastAPI Backend
+  # ─────────────────────────────────────────────
+  api:
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: propvision-api
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://propvision:${POSTGRES_PASSWORD:-propvision_secret}@postgres:5432/propvision
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - "58000:58000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    networks:
+      - propvision-network
+
+  # ─────────────────────────────────────────────
+  # React Frontend (Vite dev server)
+  # ─────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: propvision-frontend
+    ports:
+      - "53000:53000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - propvision-network
+
+  # ─────────────────────────────────────────────
+  # Nginx Reverse Proxy
+  # ─────────────────────────────────────────────
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: propvision-nginx
+    ports:
+      - "50080:80"
+      - "50443:443"
+    volumes:
+      - ./infra/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./infra/nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - api
+      - frontend
+    networks:
+      - propvision-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  propvision-network:
+    driver: bridge

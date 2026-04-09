@@ -1,0 +1,73 @@
+/* ── Overall score — oversized, left-aligned ──── */
+.comfort-overall {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.comfort-overall-num {
+  font-size: 3.5rem;
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.comfort-overall-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.comfort-overall-of {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--text-ghost);
+}
+
+/* ── Dimension bars ───────────────────────────── */
+.comfort-dims {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.comfort-dim-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 5px;
+}
+
+.comfort-dim-icon {
+  font-size: 0.6875rem;
+  color: var(--text-ghost);
+  width: 14px;
+  text-align: center;
+}
+
+.comfort-dim-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.comfort-dim-val {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+/* ── Bar track ────────────────────────────────── */
+.comfort-bar {
+  height: 3px;                    /* thin, not chunky */
+  background: var(--surface-raised);
+  border-radius: 0;              /* hard edge */
+  overflow: hidden;
+}
+
+.comfort-bar-fill {
+  height: 100%;
+  border-radius: 0;
+  transition: width 0.8s var(--ease-out-expo);
+}

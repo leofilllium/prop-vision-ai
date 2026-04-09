@@ -1,0 +1,122 @@
+/* ── Map Pins ─────────────────────────────────── */
+
+.pin {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 5px 10px 4px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;               /* hard edge — intentionally NOT rounded */
+  cursor: pointer;
+  transition: all 0.4s var(--ease-out-expo);
+  min-width: 48px;
+}
+
+.pin::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 8px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+.pin--hover {
+  border-color: var(--border-hover);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+.pin--active {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.pin--active .pin-price { color: #faf5f0; }
+.pin--active .pin-rooms { color: rgba(250, 245, 240, 0.7); }
+.pin--active::after {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.pin-price {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.pin-rooms {
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  letter-spacing: 0.04em;
+}
+
+.pin-dot {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--pin-accent, var(--text-ghost));
+}
+
+/* ── Popup ────────────────────────────────────── */
+.map-popup .mapboxgl-popup-content {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 0;
+  padding: 14px 18px;
+  box-shadow: 0 16px 48px -12px rgba(0, 0, 0, 0.5);
+}
+
+.map-popup .mapboxgl-popup-tip {
+  border-top-color: var(--surface);
+}
+
+.popup-inner {
+  max-width: 260px;
+}
+
+.popup-title {
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  line-height: 1.35;
+  margin-bottom: 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.popup-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.popup-price {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.popup-meta {
+  font-size: 0.6875rem;
+  color: var(--text-muted);
+}

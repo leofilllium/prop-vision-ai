@@ -1,0 +1,613 @@
+openapi: "3.0.3"
+info:
+  title: PropVision.AI API
+  description: |
+    B2B visualization and AI intelligence layer for real estate platforms.
+    Provides property ingestion, AI-powered search, comfort analytics, 
+    3D reconstruction management, and engagement metrics.
+  version: "1.0.0"
+  contact:
+    name: PropVision.AI Engineering
+    email: dev-support@propvision.ai
+  license:
+    name: Proprietary
+
+servers:
+  - url: https://api.propvision.ai/api/v1
+    description: Production
+  - url: http://localhost:8000/api/v1
+    description: Local Development
+
+security:
+  - ApiKeyAuth: []
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: Partner API key (format pv_live_xxxxxxxxxxxxxxxxxxxx)
+
+  schemas:
+    GeoJSONPoint:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [Point]
+        coordinates:
+          type: array
+          items:
+            type: number
+          minItems: 2
+          maxItems: 2
+          description: "[longitude, latitude]"
+
+    PropertyCreate:
+      type: object
+      required: [title, price, latitude, longitude]
+      properties:
+        title:
+          type: string
+          maxLength: 500
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+          minimum: 0
+        currency:
+          type: string
+          default: USD
+          enum: [USD, UZS]
+        rooms:
+          type: integer
+          minimum: 1
+        area_sqm:
+          type: number
+          format: float
+          minimum: 0
+        floor:
+          type: integer
+        total_floors:
+          type: integer
+        district:
+          type: string
+        address:
+          type: string
+        latitude:
+          type: number
+          format: double
+          minimum: -90
+          maximum: 90
+        longitude:
+          type: number
+          format: double
+          minimum: -180
+          maximum: 180
+        photos:
+          type: array
+          items:
+            type: string
+            format: uri
+        external_id:
+          type: string
+
+    PropertyResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        currency:
+          type: string
+        rooms:
+          type: integer
+        area_sqm:
+          type: number
+        floor:
+          type: integer
+        total_floors:
+          type: integer
+        district:
+          type: string
+        address:
+          type: string
+        location:
+          $ref: "#/components/schemas/GeoJSONPoint"
+        photos:
+          type: array
+          items:
+            type: string
+        model_3d_url:
+          type: string
+          nullable: true
+        comfort_score:
+          $ref: "#/components/schemas/ComfortScoreSummary"
+        partner_id:
+          type: string
+          format: uuid
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PropertyListResponse:
+      type: object
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/PropertyResponse"
+
+    ComfortScoreSummary:
+      type: object
+      properties:
+        overall_score:
+          type: number
+        data_confidence:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+
+    ComfortScoreDetail:
+      type: object
+      properties:
+        property_id:
+          type: string
+          format: uuid
+        scores:
+          type: object
+          properties:
+            transport:
+              $ref: "#/components/schemas/ScoreWithDetails"
+            shopping:
+              $ref: "#/components/schemas/ScoreWithDetails"
+            education:
+              $ref: "#/components/schemas/ScoreWithDetails"
+            green_space:
+              $ref: "#/components/schemas/ScoreWithDetails"
+            safety:
+              $ref: "#/components/schemas/ScoreWithDetails"
+        overall_score:
+          type: number
+        data_confidence:
+          type: string
+          enum: [LOW, MEDIUM, HIGH]
+        weights:
+          type: object
+          properties:
+            transport:
+              type: number
+            shopping:
+              type: number
+            education:
+              type: number
+            green_space:
+              type: number
+            safety:
+              type: number
+        computed_at:
+          type: string
+          format: date-time
+
+    ScoreWithDetails:
+      type: object
+      properties:
+        score:
+          type: number
+        details:
+          type: object
+          additionalProperties: true
+
+    SearchRequest:
+      type: object
+      required: [query]
+      properties:
+        query:
+          type: string
+          maxLength: 500
+          description: Natural language property search query
+
+    SearchResponse:
+      type: object
+      properties:
+        query:
+          type: string
+        parsed_filters:
+          type: object
+          properties:
+            rooms:
+              type: integer
+              nullable: true
+            min_price:
+              type: number
+              nullable: true
+            max_price:
+              type: number
+              nullable: true
+            district:
+              type: string
+              nullable: true
+            proximity_to:
+              type: string
+              nullable: true
+            max_distance_m:
+              type: integer
+              nullable: true
+            min_area_sqm:
+              type: number
+              nullable: true
+            max_area_sqm:
+              type: number
+              nullable: true
+        total:
+          type: integer
+        results:
+          type: array
+          items:
+            $ref: "#/components/schemas/PropertyResponse"
+
+    ReconstructionUploadResponse:
+      type: object
+      properties:
+        property_id:
+          type: string
+          format: uuid
+        job_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        message:
+          type: string
+        status_url:
+          type: string
+
+    ReconstructionStatusResponse:
+      type: object
+      properties:
+        property_id:
+          type: string
+          format: uuid
+        job_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, processing, completed, failed]
+        progress_percent:
+          type: integer
+          nullable: true
+        estimated_remaining_seconds:
+          type: integer
+          nullable: true
+        model_url:
+          type: string
+          nullable: true
+        model_size_bytes:
+          type: integer
+          nullable: true
+        processing_time_seconds:
+          type: integer
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        completed_at:
+          type: string
+          format: date-time
+          nullable: true
+
+    DashboardResponse:
+      type: object
+      properties:
+        api_calls:
+          type: object
+          properties:
+            daily:
+              type: array
+              items:
+                type: object
+                properties:
+                  date:
+                    type: string
+                    format: date
+                  count:
+                    type: integer
+            total_last_30_days:
+              type: integer
+        top_queries:
+          type: array
+          items:
+            type: object
+            properties:
+              query:
+                type: string
+              count:
+                type: integer
+        comfort_scores_by_district:
+          type: array
+          items:
+            type: object
+            properties:
+              district:
+                type: string
+              avg_overall_score:
+                type: number
+        model_3d_views:
+          type: object
+          properties:
+            total:
+              type: integer
+            last_7_days:
+              type: integer
+
+    ErrorResponse:
+      type: object
+      properties:
+        detail:
+          type: string
+        error_code:
+          type: string
+        status_code:
+          type: integer
+
+paths:
+  /properties:
+    post:
+      tags: [Properties]
+      summary: Create a property listing
+      description: Ingest property data from a partner platform. Fields are mapped using the partner's field_mapping configuration.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PropertyCreate"
+      responses:
+        "201":
+          description: Property created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyResponse"
+        "401":
+          description: Invalid or missing API key
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    get:
+      tags: [Properties]
+      summary: List and filter properties
+      parameters:
+        - name: district
+          in: query
+          schema:
+            type: string
+        - name: min_price
+          in: query
+          schema:
+            type: number
+        - name: max_price
+          in: query
+          schema:
+            type: number
+        - name: rooms
+          in: query
+          schema:
+            type: integer
+        - name: min_rooms
+          in: query
+          schema:
+            type: integer
+        - name: max_rooms
+          in: query
+          schema:
+            type: integer
+        - name: bbox
+          in: query
+          description: "Bounding box: sw_lng,sw_lat,ne_lng,ne_lat"
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+            maximum: 100
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+        - name: sort_by
+          in: query
+          schema:
+            type: string
+            enum: [price, rooms, created_at]
+        - name: sort_order
+          in: query
+          schema:
+            type: string
+            enum: [asc, desc]
+            default: desc
+      responses:
+        "200":
+          description: List of properties
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyListResponse"
+
+  /properties/{id}:
+    get:
+      tags: [Properties]
+      summary: Get a single property with comfort scores
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Property details with comfort scores
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyResponse"
+        "404":
+          description: Property not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /search:
+    post:
+      tags: [Search]
+      summary: AI-powered natural language property search
+      description: |
+        Parse a natural language query into structured filters using OpenAI GPT-4o-mini,
+        then execute a PostGIS spatial query to find matching properties.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SearchRequest"
+      responses:
+        "200":
+          description: Search results with parsed filters
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SearchResponse"
+        "422":
+          description: Query parsing failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /comfort/{property_id}:
+    get:
+      tags: [Comfort Analytics]
+      summary: Get comfort score breakdown for a property
+      parameters:
+        - name: property_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Detailed comfort scores
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ComfortScoreDetail"
+        "404":
+          description: Property or comfort scores not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /3d/upload:
+    post:
+      tags: [3D Reconstruction]
+      summary: Upload photos for 3D reconstruction
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [property_id, photos]
+              properties:
+                property_id:
+                  type: string
+                  format: uuid
+                photos:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  minItems: 8
+                  maxItems: 15
+      responses:
+        "202":
+          description: Reconstruction job submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReconstructionUploadResponse"
+        "422":
+          description: Validation error (wrong number of photos, invalid format)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /3d/{property_id}/status:
+    get:
+      tags: [3D Reconstruction]
+      summary: Check 3D reconstruction job status
+      parameters:
+        - name: property_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Reconstruction job status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReconstructionStatusResponse"
+        "404":
+          description: No reconstruction job found for this property
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /analytics/dashboard:
+    get:
+      tags: [Analytics]
+      summary: Get engagement metrics dashboard data
+      description: Internal-use endpoint for the PropVision analytics dashboard
+      responses:
+        "200":
+          description: Dashboard metrics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardResponse"
