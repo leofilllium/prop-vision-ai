@@ -13,7 +13,7 @@
   --surface-overlay: rgba(14, 14, 14, 0.88);
 
   /* Text — warm off-whites, never pure #fff */
-  --text-primary: #e8e4df;
+  --text-primary: red;
   --text-secondary: #8a8580;
   --text-muted: #5c5856;
   --text-ghost: #3a3836;

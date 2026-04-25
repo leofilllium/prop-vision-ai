@@ -21,7 +21,7 @@ export default function NavBar() {
       <Link to="/" className="nav-brand">
         <div className="nav-mark" aria-hidden="true" />
         <div className="nav-text">
-          <span className="nav-name">PropVision</span>
+          <span className="nav-name">Prop</span>
           <span className="nav-tag">.AI</span>
         </div>
       </Link>
