@@ -19,7 +19,7 @@
   --text-ghost: #3a3836;
 
   /* Accent — terracotta, appears < 5% of viewport */
-  --accent: #c4503a;
+  --accent: blue;
   --accent-hover: #d4604a;
   --accent-subtle: rgba(196, 80, 58, 0.1);
   --accent-glow: rgba(196, 80, 58, 0.25);
