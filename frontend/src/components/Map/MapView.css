@@ -93,7 +93,7 @@
   font-family: var(--font-body);
   font-size: 0.8125rem;
   font-weight: 500;
-  color: var(--text-primary);
+  color: grey;
   line-height: 1.35;
   margin-bottom: 6px;
   overflow: hidden;
